@@ -127,6 +127,7 @@ class Board(object):
         self.fascist_track = fascist_track
         self.liberal_track = liberal_track
         self.failed_election_count = 0
+        self.new_executive_action = None
 
     def peek_policies(self, number_of_policies):
         return self.policies.peek_cards(number_of_policies)
@@ -140,17 +141,17 @@ class Board(object):
     def place_policy(self, policy):
         if policy is FascistPolicy():
             self.reset_election_tracker()
-            return self.place_fascist_policy()
+            self.place_fascist_policy()
         elif policy is LiberalPolicy():
             self.reset_election_tracker()
-            return self.place_liberal_policy()
+            self.place_liberal_policy()
         else:
             raise ValueError("Policy is not a liberal/fascist tile..")
 
     def place_fascist_policy(self):
         fascist_track.place_policy()
         power = fascist_track.get_presidential_power()
-        return power.method
+        self.new_executive_action = power.method
 
     def place_liberal_policy(self):
         liberal_track.place_policy()
@@ -169,7 +170,7 @@ class Board(object):
         if self.failed_election_count == 3:
             policy = self.draw_policies(1)
             # Note that the tracker is reset every time we place a policy
-            place_policy(policy)
+            self.place_policy(policy)
 
     def reset_election_tracker(self):
         self.failed_election_count = 0
