@@ -1,11 +1,11 @@
-def Hitler(Fascist):
+class Hitler(Fascist):
     pass
 
-def Fascist(Role):
+class Fascist(Role):
     pass
 
-def Liberal(Role):
+class Liberal(Role):
     pass
 
-def Role(object):
+class Role(object):
     pass
