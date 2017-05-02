@@ -1,5 +1,8 @@
 from presidential_powers import *
 from win_conditions import *
+from singleton import *
+
+import random
 
 class SmallGameBoard(Board):
     def __init__(self):
@@ -27,12 +30,12 @@ class FascistTrack(Track):
     We force it to have 6 presidential powers but in practice the 6th will never be played
     """
     def __init__(self, confirm_chancellor_after_x_policies, veto_after_x_policies, presidential_powers):
-        if not isinstance(confirm_chancellor_after_x_policies, int) or confirm_chancellor_after_x_policies < 0:
-            raise ValueError("Confirm chancellor after x policies not a positive integer")
-        if not isinstance(veto_after_x_policies, int) or veto_after_x_policies < 0:
-            raise ValueError("Veto after x policies not a positive integer")
+        if not isinstance(confirm_chancellor_after_x_policies, int):
+            raise ValueError("Confirm chancellor after x policies not an integer")
+        if not isinstance(veto_after_x_policies, int):
+            raise ValueError("Veto after x policies not an integer")
         if len(presidential_powers) is not 6:
-            raise ValueError("Fascist track must have 5 possible presidential powers")
+            raise ValueError("Fascist track must have 6 possible presidential powers")
         if any([not isinstance(power, PresidentialPower) for power in presidential_powers]):
             raise ValueError("Not all fascist track init list elements are presidential powers..")
         self.presidential_powers = list(presidential_powers)
@@ -73,6 +76,8 @@ class Track(object):
 """
 
 class Deck(object):
+    """Actually both the deck and the discard pile, whoops
+    """
     def __init__(self, cards):
         self.cards = list(cards)
         self.discard = list(())
@@ -94,6 +99,9 @@ class Deck(object):
         cards_taken = [self.cards.pop() for i in number_of_cards]
         return cards_taken
 
+    def discard(self, card):
+        self.discard.append(card)
+
 
 """Define the full board type
 """
@@ -103,11 +111,12 @@ class Board(object):
     a liberal and fascist board and also the election tracker
     """
     class FascistPolicy(Policy):
-        pass
+        __metaclass__ = Singleton
     class LiberalPolicy(Policy):
-        pass
+        __metaclass__ = Singleton
     class Policy(object):
-        pass
+        def __init__(self):
+            raise NotImplementedError("This is an abstract class")
 
     def __init__(self, fascist_track, liberal_track):
         self.policies = Deck([FascistPolicy() * 11] + [LiberalPolicy() * 8])
@@ -117,6 +126,26 @@ class Board(object):
             raise ValueError("Board init param needs to be liberal track")
         self.fascist_track = fascist_track
         self.liberal_track = liberal_track
+        self.failed_election_count = 0
+
+    def peek_policies(self, number_of_policies):
+        return self.policies.peek_cards(number_of_policies)
+
+    def draw_policies(self, number_of_policies):
+        return self.policies.draw_cards(number_of_policies)
+
+    def discard_policy(self, policy):
+        self.policies.discard(policy)
+
+    def place_policy(self, policy):
+        if policy is FascistPolicy():
+            self.reset_election_tracker()
+            return self.place_fascist_policy()
+        elif policy is LiberalPolicy():
+            self.reset_election_tracker()
+            return self.place_liberal_policy()
+        else:
+            raise ValueError("Policy is not a liberal/fascist tile..")
 
     def place_fascist_policy(self):
         fascist_track.place_policy()
@@ -131,3 +160,16 @@ class Board(object):
 
     def is_veto_enabled(self):
         return fascist_track.is_veto_enabled()
+
+    def advance_election_tracker(self):
+        """If we reach 3 failed elections in a row,
+        the board draws the top policy and places it autonomously and the tracker is reset
+        """
+        self.failed_election_count += 1
+        if self.failed_election_count == 3:
+            policy = self.draw_policies(1)
+            # Note that the tracker is reset every time we place a policy
+            place_policy(policy)
+
+    def reset_election_tracker(self):
+        self.failed_election_count = 0
