@@ -1,6 +1,6 @@
 from presidential_powers import *
 from win_conditions import *
-from singleton import *
+from policies import *
 
 import random
 
@@ -16,10 +16,10 @@ class MediumGameBoard(Board):
         super(MediumGameBoard, self).__init__(fascist_board, LiberalTrack())
 
 
-class BigGameBoard(Board):
+class LargeGameBoard(Board):
     def __init__(self):
         fascist_board = FascistTrack(3, 5, (NoPower(), NoPower(), ExamineCardsPower(), KillPower(), KillPower(), NoPower()))
-        super(BigGameBoard, self).__init__(fascist_board, LiberalTrack())
+        super(LargeGameBoard, self).__init__(fascist_board, LiberalTrack())
 
 
 """Define the liberal and fascist tracks
@@ -38,13 +38,13 @@ class FascistTrack(Track):
             raise ValueError("Fascist track must have 6 possible presidential powers")
         if any([not isinstance(power, PresidentialPower) for power in presidential_powers]):
             raise ValueError("Not all fascist track init list elements are presidential powers..")
-        self.presidential_powers = list(presidential_powers)
+        self.presidential_powers = iter(presidential_powers)
         self.confirm_chancellor_after_x_policies = confirm_chancellor_after_x_policies
         self.veto_after_x_policies = veto_after_x_policies
         super(FascistTrack, self).__init__(6, FascistBoardFullWincon())
 
     def get_presidential_power(self):
-        return presidential_powers.pop()
+        return presidential_powers.next()
 
     def is_veto_enabled(self):
         return veto_after_x_policies <= self.policies_placed
@@ -110,16 +110,9 @@ class Board(object):
     """The game board features a deck of policy cards (11 fascist & 8 liberal),
     a liberal and fascist board and also the election tracker
     """
-    class FascistPolicy(Policy):
-        __metaclass__ = Singleton
-    class LiberalPolicy(Policy):
-        __metaclass__ = Singleton
-    class Policy(object):
-        def __init__(self):
-            raise NotImplementedError("This is an abstract class")
-
     def __init__(self, fascist_track, liberal_track):
-        self.policies = Deck([FascistPolicy() * 11] + [LiberalPolicy() * 8])
+        self.all_policies = [FascistPolicy()] * 11 + [LiberalPolicy()] * 8
+        self.policies = Deck(self.all_policies)
         if not isinstance(fascist_track, FascistTrack):
             raise ValueError("Board init param needs to be fascist track")
         if not isinstance(liberal_track, LiberalTrack):
