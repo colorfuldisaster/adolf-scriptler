@@ -61,9 +61,16 @@ class HumanPlayer(object):
             self.output("Nominate a chancellor!")
             choice = self.input()
             chosen_player = next((player for player in self.players if player.name == choice), None)
-            if chosen_player is not None:
+            if chosen_player is None:
+                self.input("Invalid player name.")
+            elif chosen_player is self:
+                self.input("You can't nominate yourself!")
+            elif chosen_player is self.stats.previous_president:
+                self.input("{} was the previous president. Choose someone else.".format(chosen_player.name))
+            elif chosen_player is self.stats.previous_chancellor:
+                self.input("{} was the previous chancellor. Choose someone else.".format(chosen_player.name))
+            else:
                 return chosen_player
-            self.input("Invalid player name.")
 
     def vote(self):
         while True:
