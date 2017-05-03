@@ -144,7 +144,7 @@ class Board(object):
     def place_fascist_policy(self):
         fascist_track.place_policy()
         power = fascist_track.get_presidential_power()
-        self.new_executive_action = power.method
+        self.new_executive_action = power
 
     def place_liberal_policy(self):
         liberal_track.place_policy()
