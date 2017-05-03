@@ -67,7 +67,9 @@ class Game(object):
         def is_chancellor_asked_if_hitler(self):
             return self.board.should_ask_if_chancellor_is_hitler()
 
-    def __init__(self, players):
+    def __init__(self, announce, players):
+        """Accept an announce method and a list of Player objects
+        """
         # Choose board and roles based on number of players
         based_on_players = {5:     SmallGameBoard, [Hitler()] + [Fascist()] * 1 + [Liberal()] * 3
                             6:     SmallGameBoard, [Hitler()] + [Fascist()] * 1 + [Liberal()] * 4
@@ -84,6 +86,7 @@ class Game(object):
         self.players = players
         random.shuffle(self.players)
         self.player_rotation = itertools.cycle(players)
+        self.announce = announce
 
     def play(self):
         self.distribute_roles()
@@ -106,14 +109,26 @@ class Game(object):
                     # Government does stuff
                     self.legislative_session()
                     self.executive_action()
-        except WinCondition as wc:
-            pass # TODO
+        except FascistWinCondition as wc:
+            self.announce("The fascists win! They were:")
+            for player in (player for player in self.players if isinstance(player.role, Fascist)):
+                self.announce("{}: {}".format(player.name, player.role))
+            self.announce("Thanks for playing!")
+        except LiberalWinCondition as wc:
+            self.announce("The liberals win! They were:")
+            for player in (player for player in self.players if isinstance(player.role, Liberal)):
+                self.announce("{}: {}".format(player.name, player.role))
+            self.announce("Thanks for playing!")
 
     def pass_presidency(self):
         self.stats.presidential_candidate = self.player_rotation.next()
 
     def nominate_chancellor(self):
         self.stats.nominated_chancellor = self.stats.presidential_candidate.nominate_chancellor()
+        if self.stats.nominated_chancellor is self.stats.presidential_candidate:
+            raise ValueError("The president can't elect themselves!")
+        if self.stats.nominated_chancellor in (self.stats.previous_president, self.stats.previous_chancellor):
+            raise ValueError("Can't elect as councellor the previous president/chancellor")
         self.stats.nominations.append((self.stats.presidential_candidate, self.stats.nominated_chancellor))
 
     def vote_on_the_government(self):
@@ -123,6 +138,13 @@ class Game(object):
         if votes.count(Ja()) > votes.count(Nein()):
             self.stats.current_president = self.stats.presidential_candidate
             self.stats.current_chancellor = self.stats.nominated_chancellor
+            # Check for hitlers
+            if self.board.should_ask_if_chancellor_is_hitler:
+                if self.stats.current_chancellor.role is Hitler():
+                    self.announce("{} is Hitler!".format(self.stats.current_chancellor.name))
+                    raise HitlerElectedWinCondition()
+                else:
+                    self.announce("{} is not Hitler.".format(self.stats.current_chancellor.name))
             # Keep the president & chancellor who were last elected for eligibility reasons
             self.stats.previous_president = self.stats.current_president
             self.stats.previous_chancellor = self.stats.current_chancellor
