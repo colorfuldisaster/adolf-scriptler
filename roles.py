@@ -1,11 +1,13 @@
+from singleton import *
+
 class Hitler(Fascist):
-    pass
+    __metaclass__ = Singleton
 
 class Fascist(Role):
-    pass
+    __metaclass__ = Singleton
 
 class Liberal(Role):
-    pass
+    __metaclass__ = Singleton
 
 class Role(object):
     pass
