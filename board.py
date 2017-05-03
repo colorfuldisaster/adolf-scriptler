@@ -41,7 +41,7 @@ class FascistTrack(Track):
         self.presidential_powers = iter(presidential_powers)
         self.confirm_chancellor_after_x_policies = confirm_chancellor_after_x_policies
         self.veto_after_x_policies = veto_after_x_policies
-        super(FascistTrack, self).__init__(6, FascistBoardFullWincon())
+        super(FascistTrack, self).__init__(6, FascistPolicyWinCondition())
 
     def get_presidential_power(self):
         return presidential_powers.next()
@@ -55,7 +55,7 @@ class FascistTrack(Track):
 
 class LiberalTrack(Track):
     def __init__(self):
-        super(LiberalTrack, self).__init__(5, LiberalBoardFullWincon())
+        super(LiberalTrack, self).__init__(5, LiberalPolicyWinCondition())
 
 
 class Track(object):
