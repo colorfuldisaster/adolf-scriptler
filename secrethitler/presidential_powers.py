@@ -1,12 +1,19 @@
-# TODO
-class ExamineCardsPower(PresidentialPower):
-    def __call__(self, president):
-        pass # TODO
-
-class NoPower(PresidentialPower):
-    def __call__(self, president):
-        pass
+from singleton import *
 
 class PresidentialPower(object):
-    def __call__(self, president):
-        raise NotImplementedError("Each power needs the method to define what it does")
+    pass
+
+class KillPower(PresidentialPower):
+    __metaclass__ = Singleton
+
+class SurpriseElectionPower(PresidentialPower):
+    __metaclass__ = Singleton
+
+class InvestigativePower(PresidentialPower):
+    __metaclass__ = Singleton
+
+class ExamineCardsPower(PresidentialPower):
+    __metaclass__ = Singleton
+
+class NoPower(PresidentialPower):
+    __metaclass__ = Singleton

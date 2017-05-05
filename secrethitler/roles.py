@@ -1,13 +1,19 @@
 from singleton import *
 
-class Hitler(Fascist):
-    __metaclass__ = Singleton
+class Role(object):
+    pass
 
 class Fascist(Role):
     __metaclass__ = Singleton
+    def __str__(self):
+        return "Fascist"
 
 class Liberal(Role):
     __metaclass__ = Singleton
+    def __str__(self):
+        return "Liberal"
 
-class Role(object):
-    pass
+class Hitler(Fascist):
+    __metaclass__ = Singleton
+    def __str__(self):
+        return "Hitler"
