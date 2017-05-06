@@ -42,11 +42,7 @@ class FascistTrack(Track):
     def check_power(self, number_of_policies):
         """Checks what power is activated after N policies
         """
-        try:
-            power = self.presidential_powers[number_of_policies]
-        except KeyError:
-            power = NoPower()
-        return power
+        return self.presidential_powers.get(number_of_policies, NoPower())
 
     def check_current_power(self):
         return self.check_power(self.policies)
