@@ -2,9 +2,9 @@ import discord
 import asyncio
 import secrethitler
 
-from commands import *
-
 client = discord.Client()
+
+from .commands import *
 
 @client.event
 async def on_ready():
@@ -18,7 +18,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if isinstance(message.author, User):
+    if message.channel.is_private:
         on_personal_message(message)
     else:
         on_channel_message(message)
@@ -32,8 +32,9 @@ def on_personal_message(message):
 
 def on_channel_message(message):
     if client.user.mentioned_in(message):
+        #print("Hi {user}!".format(user=message.author))
         # Treat all highlights as commands for the bot
-        on_channel_command(message)
+        execute_channel_command(message)
 
 def start_client(token):
-    client.run(args.token)
+    client.run(token)

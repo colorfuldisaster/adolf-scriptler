@@ -1,1 +1,1 @@
-from discord_interface import *
+from .discord_interface import *

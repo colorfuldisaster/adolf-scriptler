@@ -1,14 +1,11 @@
-from board import *
-from roles import *
-from win_conditions import *
-from statemachine import *
-from votes import *
+from .board import *
+from .roles import *
+from .win_conditions import *
+from .statemachine import *
+from .votes import *
 
 import itertools
 import random
-
-def myprint(str):
-    print str
 
 
 class Statistics(object):
@@ -195,7 +192,7 @@ class Game(StateMachine):
             return
 
 
-    def __init__(self, players, announce=myprint):
+    def __init__(self, players, announce=print):
         """Accept an announce method and a list of Player objects
         """
         self.players = list(players)
@@ -242,10 +239,10 @@ class Game(StateMachine):
         self.announce("You too, Hitler!" if should_hitler_know_teammates else "Hitler, YOU don't get a PM. Good luck.")
 
     def pass_presidency(self):
-        self.stats.presidential_candidate = self.player_rotation.next()
+        self.stats.presidential_candidate = next(self.player_rotation)
         while self.stats.presidential_candidate not in self.players:
             # Can't remove dead players from the cycle(), so we do this instead
-            self.stats.presidential_candidate = self.player_rotation.next()
+            self.stats.presidential_candidate = next(self.player_rotation)
 
     def nominate_chancellor(self):
         self.announce("The presidential candidate is {}. Who do you nominate as chancellor?".format(self.stats.presidential_candidate.name))
@@ -327,11 +324,12 @@ class Game(StateMachine):
             self.announce("Chaos! The first policy in the deck will be enacted.")
             self.stats.previous_president = None
             self.stats.previous_chancellor = None
-            self.enacted_policy = self.board.draw_policies(1)
+            (self.enacted_policy,) = self.board.draw_policies(1)
 
     def enact_policy(self):
         self.board.place_policy(self.enacted_policy)
-        self.announce("Policy on the board: {}".format(self.enacted_policy))
+        number_of_policies = self.stats.fascist_policies if self.enacted_policy is FascistPolicy() else self.stats.liberal_policies
+        self.announce("Policy on the board: {type} #{number}".format(type=self.enacted_policy, number=number_of_policies))
         self.stats.election_tracker = 0
 
     def check_policy_tracks(self):

@@ -1,6 +1,6 @@
-from presidential_powers import *
-from win_conditions import *
-from policies import *
+from .presidential_powers import *
+from .win_conditions import *
+from .policies import *
 
 import random
 

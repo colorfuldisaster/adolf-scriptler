@@ -1,17 +1,14 @@
-from policies import *
-from votes import *
-from roles import *
-
-def myprint(str):
-    print str
+from .policies import *
+from .votes import *
+from .roles import *
 
 class HumanPlayer(object):
     """Implements UI for PvP gameplay
     """
-    def __init__(self, name, input=raw_input, output=myprint):
+    def __init__(self, name, input=input, output=print):
         self.name = name
         self.input = input
-        self.output = lambda str: output("{}:\t{}".format(self.name, str))
+        self.output = output
 
     def identify_policy_from_input(self, user_input):
         user_input = user_input.lower()

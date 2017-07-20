@@ -1,10 +1,10 @@
-from singleton import *
+from .singleton import *
 
-class Vote(object):
+class Vote(object, metaclass=Singleton):
     pass
 
 class Ja(Vote):
-    __metaclass__ = Singleton
+    pass
 
 class Nein(Vote):
-    __metaclass__ = Singleton
+    pass

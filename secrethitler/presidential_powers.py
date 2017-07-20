@@ -1,19 +1,19 @@
-from singleton import *
+from .singleton import *
 
-class PresidentialPower(object):
+class PresidentialPower(object, metaclass=Singleton):
     pass
 
 class KillPower(PresidentialPower):
-    __metaclass__ = Singleton
+    pass
 
 class SurpriseElectionPower(PresidentialPower):
-    __metaclass__ = Singleton
+    pass
 
 class InvestigativePower(PresidentialPower):
-    __metaclass__ = Singleton
+    pass
 
 class ExamineCardsPower(PresidentialPower):
-    __metaclass__ = Singleton
+    pass
 
 class NoPower(PresidentialPower):
-    __metaclass__ = Singleton
+    pass
